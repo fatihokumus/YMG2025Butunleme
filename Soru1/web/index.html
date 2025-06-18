@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Görev Takip Sistemi</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 40px;
+      background-color: #f4f4f4;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    #taskForm {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    #description {
+      width: 300px;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #aaa;
+      border-radius: 4px;
+    }
+
+    button {
+      padding: 10px 16px;
+      margin-left: 8px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    #taskList {
+      list-style-type: none;
+      padding: 0;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .task-item {
+      background-color: white;
+      margin: 8px 0;
+      padding: 12px 16px;
+      border-radius: 6px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .task-completed {
+      color: green;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Görev Takip Sistemi</h1>
+
+  <form id="taskForm">
+    <input type="text" id="description" placeholder="Yeni görev girin..." required />
+    <button type="submit">Ekle</button>
+  </form>
+
+  <ul id="taskList"></ul>
+
+  <script>
+    const form = document.getElementById("taskForm");
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      const desc = document.getElementById("description").value;
+      await fetch("http://localhost:5055/tasks", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({description: desc})
+      });
+      document.getElementById("description").value = "";
+      loadTasks();
+    };
+
+    async function loadTasks() {
+      const res = await fetch("http://localhost:5055/tasks");
+      const tasks = await res.json();
+      const list = document.getElementById("taskList");
+      list.innerHTML = "";
+      tasks.forEach(task => {
+        const item = document.createElement("li");
+        item.className = "task-item";
+        item.innerHTML = `
+          <span>${task.description}</span>
+          <span class="${task.completed ? 'task-completed' : ''}">
+            ${task.completed ? "✔ Tamamlandı" : ""}
+          </span>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    window.onload = loadTasks;
+  </script>
+
+</body>
+</html>

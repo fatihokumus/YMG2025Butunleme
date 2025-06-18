@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Kullanıcı Kayıt</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 40px;
+      background: #f0f0f0;
+    }
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      width: 300px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input, button {
+      margin-top: 10px;
+      width: 100%;
+      padding: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <form id="registerForm">
+    <h3>Kullanıcı Kayıt</h3>
+    <input type="text" id="name" placeholder="Ad Soyad" required />
+    <input type="email" id="email" placeholder="E-posta" required />
+    <input type="password" id="password" placeholder="Şifre" required />
+    <button type="submit">Kayıt Ol</button>
+    <p id="result"></p>
+  </form>
+
+  <script>
+    document.getElementById("registerForm").onsubmit = async (e) => {
+      e.preventDefault();
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      const res = await fetch("http://localhost:8081/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password })
+      });
+
+      const result = document.getElementById("result");
+      if (res.ok) {
+        result.innerText = "Kayıt başarılı!";
+        result.style.color = "green";
+      } else {
+        const data = await res.json();
+        result.innerText = "Hata: " + (data.message || "Kayıt başarısız");
+        result.style.color = "red";
+      }
+    };
+  </script>
+
+</body>
+</html>
